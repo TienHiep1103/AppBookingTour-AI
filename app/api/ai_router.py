@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.schemas.ai_schema import AIRequest, AIResponse
-from app.services.ai_service import predictComment
+from ..schemas.ai_schema import AIRequest, AIResponse
+from ..services.ai_service import predictComment
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 

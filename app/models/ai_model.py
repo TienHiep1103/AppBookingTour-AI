@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, AutoConfig
-from app.config import MODEL_NAME, DEVICE
+from ..config import MODEL_NAME, DEVICE
 
 # Mapping cho model 5CD-AI: 0-Negative, 1-Positive, 2-Neutral (nhãn gốc của model)
 LABEL_MAP = {"NEG": 0, "POS": 1, "NEU": 2}
