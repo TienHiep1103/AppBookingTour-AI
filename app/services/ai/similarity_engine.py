@@ -1,10 +1,23 @@
 from sklearn.metrics.pairwise import cosine_similarity
 
-def top_k_similar(vectors, item_index: int, top_k: int):
+def top_k_similar(vectors, item_index: int, top_k: int = 5, min_score: float = 0.1):
+    vectors = normalize(vectors)
+
     scores = cosine_similarity(
         vectors[item_index],
         vectors
     ).flatten()
 
-    indices = scores.argsort()[::-1]
-    return indices[1: top_k + 1]
+    # loại chính nó
+    scores[item_index] = -1
+
+    # sắp xếp giảm dần
+    sorted_idx = np.argsort(scores)[::-1]
+
+    results = [
+        (i, float(scores[i]))
+        for i in sorted_idx
+        if scores[i] >= min_score
+    ]
+
+    return results[:top_k]

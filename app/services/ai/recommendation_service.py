@@ -5,6 +5,7 @@ from app.services.accommodation_service import get_accommodations_by_city_id, _e
 from ...models.accommodation import Accommodation
 from ...schemas.accommodation_schema import AccommodationResponse
 import random
+from .cache import get_features
 
 def recommend_accommodations(db, item_id: int, top_k: int):
     acc = db.query(Accommodation).get(item_id)
@@ -60,3 +61,43 @@ def recommend_accommodations(db, item_id: int, top_k: int):
         responses.append(AccommodationResponse(**acc_dict))
     
     return responses
+
+def recommend_tours(db, tour_id: int, top_k: int = 5):
+    tour = db.query(Tour).get(tour_id)
+    if not tour or not tour.is_active:
+        return []
+    cached = get_features("tour")
+    if not cached:
+        tours = db.query(Tour).filter(Tour.is_active == True).all()
+        if not tours:
+            return []
+
+        build_tour_features(tours)
+        cached = get_features("tour")
+    ids = cached["ids"]
+    vectors = cached["vectors"]
+    if tour_id not in ids:
+        return []
+    index = ids.index(tour_id)
+    similar = top_k_similar(vectors, index, top_k)
+    if not similar:
+        return []
+    recommended_ids = [ids[i] for i, _ in similar]
+    result = (
+        db.query(Tour)
+        .filter(
+            Tour.is_active == True,
+            Tour.id.in_(recommended_ids)
+        )
+        .all()
+    )
+    tour_map = {t.id: t for t in result}
+    ordered = [tour_map[i] for i in recommended_ids if i in tour_map]
+    return [
+        {
+            "tour_id": t.id,
+            "name": t.name,
+            "score": score
+        }
+        for t, (_, score) in zip(ordered, similar)
+    ]
