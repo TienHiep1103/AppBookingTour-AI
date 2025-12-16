@@ -47,3 +47,4 @@ class Tour(BaseEntity):
     image_main_url = Column("ImageMainUrl", String(500), nullable=True)
 
     is_active = Column("IsActive", Boolean, nullable=False, default=True)
+    is_deleted = Column("IsDeleted", Boolean, nullable=False, default=False)

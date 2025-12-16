@@ -28,6 +28,6 @@ def get_accommodation_recommendations(item_id: int, top_k: int = 5, db: Session 
 def get_tour_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
     return recommend_tours(db, item_id, top_k=top_k)
 
-@ai_router.router.get("/crash-test")
+@router.get("/crash-test")
 async def crash():
     1 / 0

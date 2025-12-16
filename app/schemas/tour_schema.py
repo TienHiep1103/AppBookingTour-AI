@@ -38,6 +38,8 @@ class TourBase(BaseModel):
 
 class TourResponse(TourBase):
     id: int
+    departure_city_name: Optional[str] = None
+    destination_city_name: Optional[str] = None
 
     class Config:
         from_attributes = True   # SQLAlchemy ➜ Pydantic

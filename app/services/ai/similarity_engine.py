@@ -1,4 +1,6 @@
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize
+import numpy as np
 
 def top_k_similar(vectors, item_index: int, top_k: int = 5, min_score: float = 0.1):
     vectors = normalize(vectors)

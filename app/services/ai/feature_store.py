@@ -59,8 +59,8 @@ def build_tour_features(tours: list):
         [
             t.duration_nights or 0,
             t.duration_days or 0,
-            np.log1p(t.base_price_adult or 0),
-            np.log1p(t.base_price_child or 0)
+            np.log1p(float(t.base_price_adult or 0)),
+            np.log1p(float(t.base_price_child or 0))
         ]
         for t in tours
     ])
@@ -79,3 +79,6 @@ def build_tour_features(tours: list):
         "tfidf": tfidf,
         "scaler": scaler
     }
+    
+def get_tour_features():
+    return _feature_cache.get("tour")

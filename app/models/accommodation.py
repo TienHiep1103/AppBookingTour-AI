@@ -31,3 +31,5 @@ class Accommodation(BaseEntity):
 
     cover_img_url = Column("CoverImgUrl", String(500), nullable=True)
     coordinates = Column("Coordinates", String(50), nullable=True)  # "lat, lon"
+    
+    is_deleted = Column("IsDeleted", Boolean, default=False)

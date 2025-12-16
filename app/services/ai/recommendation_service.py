@@ -1,15 +1,16 @@
 from app.models.city import City
-from .feature_store import get_city_features, build_city_features
+from .feature_store import get_city_features, build_city_features, build_tour_features, get_tour_features
 from .similarity_engine import top_k_similar
 from app.services.accommodation_service import get_accommodations_by_city_id, _enrich_accommodations_with_room_info
 from ...models.accommodation import Accommodation
+from ...models.tour import Tour
 from ...schemas.accommodation_schema import AccommodationResponse
+from ...schemas.tour_schema import TourResponse
 import random
-from .cache import get_features
 
 def recommend_accommodations(db, item_id: int, top_k: int):
     acc = db.query(Accommodation).get(item_id)
-    if not acc:
+    if not acc or not acc.is_active or acc.is_deleted:
         return []
 
     city_id = acc.city_id
@@ -39,6 +40,7 @@ def recommend_accommodations(db, item_id: int, top_k: int):
         needed = top_k - len(result)
         other_accs = db.query(Accommodation).filter(
             Accommodation.is_active == True,
+            Accommodation.is_deleted == False,
             Accommodation.city_id != city_id,
             Accommodation.id.notin_(recommended_ids)
         ).all()
@@ -64,16 +66,17 @@ def recommend_accommodations(db, item_id: int, top_k: int):
 
 def recommend_tours(db, tour_id: int, top_k: int = 5):
     tour = db.query(Tour).get(tour_id)
+    print('hehehe', tour)
     if not tour or not tour.is_active:
         return []
-    cached = get_features("tour")
+    cached = get_tour_features()
     if not cached:
-        tours = db.query(Tour).filter(Tour.is_active == True).all()
+        tours = db.query(Tour).filter(Tour.is_active == True, Tour.is_deleted == False).all()
         if not tours:
             return []
 
         build_tour_features(tours)
-        cached = get_features("tour")
+        cached = get_tour_features()
     ids = cached["ids"]
     vectors = cached["vectors"]
     if tour_id not in ids:
@@ -87,17 +90,29 @@ def recommend_tours(db, tour_id: int, top_k: int = 5):
         db.query(Tour)
         .filter(
             Tour.is_active == True,
+            Tour.is_deleted == False,
             Tour.id.in_(recommended_ids)
         )
         .all()
     )
     tour_map = {t.id: t for t in result}
     ordered = [tour_map[i] for i in recommended_ids if i in tour_map]
-    return [
-        {
-            "tour_id": t.id,
-            "name": t.name,
-            "score": score
-        }
-        for t, (_, score) in zip(ordered, similar)
-    ]
+    
+    # Get city names for departure and destination
+    city_ids = set()
+    for t in ordered:
+        city_ids.add(t.departure_city_id)
+        city_ids.add(t.destination_city_id)
+    
+    cities = db.query(City).filter(City.id.in_(city_ids)).all()
+    city_map = {city.id: city.name for city in cities}
+    
+    # Convert to TourResponse with city names
+    responses = []
+    for t in ordered:
+        tour_dict = TourResponse.model_validate(t).model_dump()
+        tour_dict['departure_city_name'] = city_map.get(t.departure_city_id)
+        tour_dict['destination_city_name'] = city_map.get(t.destination_city_id)
+        responses.append(TourResponse(**tour_dict))
+    
+    return responses

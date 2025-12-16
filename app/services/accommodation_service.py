@@ -17,11 +17,11 @@ def get_all_accommodation(db: Session):
     return db.query(Accommodation).filter(Accommodation.is_active == True).all()
 
 def get_accommodations_by_city_id(db: Session, city_id: int) -> List[AccommodationResponse]:
-    accommodations = db.query(Accommodation).filter(Accommodation.city_id == city_id, Accommodation.is_active == True).all()
+    accommodations = db.query(Accommodation).filter(Accommodation.city_id == city_id, Accommodation.is_active == True, Accommodation.is_deleted == False).all()
     return _enrich_accommodations_with_room_info(db, accommodations)
 
 def get_accommodations_other_by_city_id(db: Session, city_id: int) -> List[AccommodationResponse]:
-    accommodations = db.query(Accommodation).filter(Accommodation.city_id != city_id, Accommodation.is_active == True).all()
+    accommodations = db.query(Accommodation).filter(Accommodation.city_id != city_id, Accommodation.is_active == True, Accommodation.is_deleted == False).all()
     return _enrich_accommodations_with_room_info(db, accommodations)
 
 def _enrich_accommodations_with_room_info(db: Session, accommodations: List[Accommodation]) -> List[AccommodationResponse]:
