@@ -32,7 +32,9 @@ def build_city_features(city_id: int, accommodations: list):
 
     _feature_cache[city_id] = {
         "vectors": final_vec,
-        "ids": [a.id for a in accommodations]
+        "ids": [...],
+        "tfidf": tfidf,
+        "scaler": scaler
     }
 
 def get_city_features(city_id: int):
@@ -40,3 +42,40 @@ def get_city_features(city_id: int):
 
 def clear_city_features(city_id: int):
     _feature_cache.pop(city_id, None)
+
+def build_tour_features(tours: list):
+    texts = [f"{t.name or ''} {t.description or ''}"for t in tours]
+
+    tfidf = TfidfVectorizer(
+        tokenizer=vietnamese_tokenizer,
+        stop_words=VI_STOPWORDS,
+        max_features=500,
+        ngram_range=(1, 2)
+    )
+
+    text_vec = tfidf.fit_transform(texts)
+
+    numeric = np.array([
+        [
+            t.duration_nights or 0,
+            t.duration_days or 0,
+            np.log1p(t.base_price_adult or 0),
+            np.log1p(t.base_price_child or 0)
+        ]
+        for t in tours
+    ])
+
+    scaler = MinMaxScaler()
+    numeric_vec = scaler.fit_transform(numeric)
+
+    final_vec = hstack([
+        text_vec * 0.6,
+        numeric_vec * 0.4
+    ]).tocsr()
+
+    _feature_cache["tour"] = {
+        "vectors": final_vec,
+        "ids": [t.id for t in tours],
+        "tfidf": tfidf,
+        "scaler": scaler
+    }

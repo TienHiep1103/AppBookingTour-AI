@@ -7,9 +7,10 @@ from ..schemas.ai_schema import AIRequest, AIResponse, RecommendationDetailReque
 from ..services.ai_service import predictComment
 from ..schemas.tour_schema import TourResponse
 from ..schemas.accommodation_schema import AccommodationResponse
+from ..schemas.tour_schema import TourResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from app.services.ai.recommendation_service import recommend_accommodations
+from app.services.ai.recommendation_service import recommend_accommodations, recommend_tours
 
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -20,5 +21,13 @@ def predictComment_endpoint(request: AIRequest):
     return AIResponse(label=label)
 
 @router.get("/accommodations/recommendations/{item_id}", response_model=list[AccommodationResponse])
-def get_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
+def get_accommodation_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
     return recommend_accommodations(db, item_id, top_k=top_k)
+
+@router.get("/tours/recommendations/{item_id}", response_model=list[TourResponse])
+def get_tour_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
+    return recommend_tours(db, item_id, top_k=top_k)
+
+@ai_router.router.get("/crash-test")
+async def crash():
+    1 / 0
