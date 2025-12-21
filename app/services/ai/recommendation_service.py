@@ -12,23 +12,8 @@ from app.enums import VehicleType
 import random
 
 def recommend_accommodations(db, item_id: int, top_k: int, exclude_ids: list[int] = None):
-    """
-    Recommend accommodations with diversity re-ranking to avoid over-specialization.
-    
-    Strategy:
-    1. Exclude current accommodation and recently viewed ones
-    2. Get similarity scores from content-based filtering
-    3. Apply diversity re-ranking based on city_id, star_rating, and type
-    4. Mix similar accommodations with exploration options
-    
-    Args:
-        db: Database session
-        item_id: Current accommodation ID
-        top_k: Number of recommendations to return
-        exclude_ids: List of accommodation IDs to exclude (e.g., recently viewed)
-    """
     acc = db.query(Accommodation).get(item_id)
-    if not acc or not acc.is_active or acc.is_deleted:
+    if not acc or not acc.is_active:
         return []
 
     # Build exclude set (current accommodation + recently viewed)
@@ -61,7 +46,6 @@ def recommend_accommodations(db, item_id: int, top_k: int, exclude_ids: list[int
     candidate_ids = [ids[idx] for idx, score in similar_filtered]
     same_city_accs = db.query(Accommodation).filter(
         Accommodation.is_active == True,
-        Accommodation.is_deleted == False,
         Accommodation.id.in_(candidate_ids)
     ).all()
     
@@ -117,7 +101,6 @@ def recommend_accommodations(db, item_id: int, top_k: int, exclude_ids: list[int
         
         other_city_accs = db.query(Accommodation).filter(
             Accommodation.is_active == True,
-            Accommodation.is_deleted == False,
             Accommodation.city_id != city_id,
             Accommodation.id.notin_(used_ids)
         ).all()
@@ -181,7 +164,7 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     - 1 random tour for exploration
     """
     tour = db.query(Tour).get(tour_id)
-    if not tour or not tour.is_active or tour.is_deleted:
+    if not tour or not tour.is_active:
         return []
     
     # Build exclude list (current tour + recently viewed)
@@ -191,7 +174,7 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     
     cached = get_tour_features()
     if not cached:
-        tours = db.query(Tour).filter(Tour.is_active == True, Tour.is_deleted == False).all()
+        tours = db.query(Tour).filter(Tour.is_active == True, Tour.is_combo == False).all()
         if not tours:
             return []
         build_tour_features(tours)
@@ -206,7 +189,6 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     # Get all active tours for re-ranking
     all_tours = db.query(Tour).filter(
         Tour.is_active == True,
-        Tour.is_deleted == False,
         Tour.id.notin_(exclude_set)
     ).all()
     
@@ -227,12 +209,13 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     final_recommendations = []
     used_ids = set()
     
-    # 1. Add 2 most similar tours
+    # 1. Add most similar tours (top_k - 2 if top_k > 2, otherwise 2)
+    num_similar = top_k - 2 if top_k > 2 else 2
     similar_count = 0
     for idx, score in similar_filtered:
-        if similar_count >= 2:
+        if similar_count >= num_similar:
             break
-        tour_obj = db.query(Tour).filter(Tour.id == ids[idx], Tour.is_active == True, Tour.is_deleted == False).first()
+        tour_obj = db.query(Tour).filter(Tour.id == ids[idx], Tour.is_active == True, Tour.is_combo == False).first()
         if tour_obj:
             final_recommendations.append(tour_obj)
             used_ids.add(tour_obj.id)
@@ -302,15 +285,9 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     return responses
 
 def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] = None):
-    """
-    Recommend combos with diversified selection:
-    - 2 most similar combos
-    - 1 combo with same destination but different vehicle type
-    - 1 combo with different destination city
-    - Random fallback for insufficient results
-    """
+
     combo = db.query(Combo).get(combo_id)
-    if not combo or not combo.is_active or combo.is_deleted:
+    if not combo or not combo.is_active:
         return []
     
     # Build exclude list (current combo + recently viewed)
@@ -320,7 +297,7 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
     
     cached = get_combo_features()
     if not cached:
-        combos = db.query(Combo).filter(Combo.is_active == True, Combo.is_deleted == False).all()
+        combos = db.query(Combo).filter(Combo.is_active == True, Combo.is_combo == True).all()
         if not combos:
             return []
         build_combo_features(combos)
@@ -335,7 +312,7 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
     # Get all active combos for re-ranking
     all_combos = db.query(Combo).filter(
         Combo.is_active == True,
-        Combo.is_deleted == False,
+        Combo.is_combo == True,
         Combo.id.notin_(exclude_set)
     ).all()
     
@@ -369,18 +346,16 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
             break
         combo_obj = db.query(Combo).filter(
             Combo.id == ids[idx], 
-            Combo.is_active == True, 
-            Combo.is_deleted == False
+            Combo.is_active == True,
+            Combo.is_combo == True
         ).first()
         if combo_obj:
             final_recommendations.append(combo_obj)
             used_ids.add(combo_obj.id)
             similar_count += 1
     
-    # 2. Add 1 combo with same destination but different vehicle type (not already added)
     same_dest_candidates = [c for c in same_dest_diff_vehicle if c.id not in used_ids]
     if same_dest_candidates:
-        # Prefer the most similar one from same destination, different vehicle
         same_dest_with_score = []
         for c in same_dest_candidates:
             if c.id in ids:
@@ -394,10 +369,8 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
             final_recommendations.append(selected)
             used_ids.add(selected.id)
     
-    # 3. Add 1 combo with different destination (not already added)
     diff_dest_candidates = [c for c in different_destination if c.id not in used_ids]
     if diff_dest_candidates:
-        # Prefer the most similar one from different destination
         diff_dest_with_score = []
         for c in diff_dest_candidates:
             if c.id in ids:
@@ -411,7 +384,6 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
             final_recommendations.append(selected)
             used_ids.add(selected.id)
     
-    # 4. Random fallback if not enough recommendations
     if len(final_recommendations) < top_k:
         needed = top_k - len(final_recommendations)
         fallback_candidates = [c for c in all_combos if c.id not in used_ids]
@@ -441,7 +413,6 @@ def recommend_combos(db, combo_id: int, top_k: int = 5, exclude_ids: list[int] =
                     final_recommendations.append(c)
                     used_ids.add(c.id)
     
-    # Trim to top_k if needed
     final_recommendations = final_recommendations[:top_k]
     
     # Get city names

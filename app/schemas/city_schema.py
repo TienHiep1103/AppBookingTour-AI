@@ -37,8 +37,6 @@ class CityResponse(CityBase):
     id: int
     created_at: datetime
     updated_at: Optional[datetime]
-    is_deleted: bool
-    deleted_at: Optional[datetime]
 
     class Config:
         from_attributes = True  # SQLAlchemy ➜ Pydantic

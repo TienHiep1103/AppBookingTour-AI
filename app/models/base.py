@@ -18,8 +18,6 @@ class BaseEntity(Base):
 
     created_at = Column( "CreatedAt", DateTime, nullable=False, server_default=func.now())
     updated_at = Column( "UpdatedAt", DateTime, nullable=True, onupdate=func.now())
-    is_deleted = Column( "IsDeleted", Boolean, nullable=False, server_default="0")
-    deleted_at = Column( "DeletedAt", DateTime, nullable=True)
 
     # Concurrency token (rowversion / timestamp)
     row_version = Column( "RowVersion", LargeBinary, nullable=False)

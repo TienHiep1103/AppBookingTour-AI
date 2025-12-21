@@ -17,3 +17,7 @@ app.add_middleware(
 
 app.include_router(ai_router.router)
 app.include_router(item_router.router)
+
+@app.get("/")
+def read_root():
+    return "Hello AI API"

@@ -48,4 +48,4 @@ class Tour(BaseEntity):
     short_description = Column("ShortDescription", String(500), nullable=True)
 
     is_active = Column("IsActive", Boolean, nullable=False, default=True)
-    is_deleted = Column("IsDeleted", Boolean, nullable=False, default=False)
+    is_combo = Column("IsCombo", Boolean, nullable=False, default=False)
