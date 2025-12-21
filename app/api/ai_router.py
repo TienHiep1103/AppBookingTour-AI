@@ -10,7 +10,7 @@ from ..schemas.accommodation_schema import AccommodationResponse
 from ..schemas.tour_schema import TourResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from app.services.ai.recommendation_service import recommend_accommodations, recommend_tours
+from app.services.ai.recommendation_service import recommend_accommodations, recommend_tours, recommend_combos
 
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -27,6 +27,10 @@ def get_accommodation_recommendations(item_id: int, top_k: int = 5, db: Session 
 @router.get("/tours/recommendations/{item_id}", response_model=list[TourResponse])
 def get_tour_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
     return recommend_tours(db, item_id, top_k=top_k)
+
+@router.get("/combos/recommendations/{item_id}", response_model=list[ComboResponse])
+def get_combo_recommendations(item_id: int, top_k: int = 5, db: Session = Depends(get_db)):
+    return recommend_combos(db, item_id, top_k=top_k)
 
 @router.get("/crash-test")
 async def crash():

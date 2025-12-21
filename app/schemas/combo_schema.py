@@ -1,38 +1,22 @@
 from pydantic import BaseModel
 from typing import Optional
-from decimal import Decimal
+from app.schemas.tour_schema import TourBase
+from app.enums import VehicleType
 
-class ComboBase(BaseModel):
-    from_city_id: int
-    to_city_id: int
-
-    code: str
-    name: str
-    short_description: Optional[str]
-
-    vehicle: int
-    duration_days: int
-
-    base_price_adult: Decimal
-    base_price_children: Decimal
-
-    amenities: Optional[str]
-    description: Optional[str]
-    additional_info: Optional[str]
-    important_info: Optional[str]
-
-    rating: Decimal
-    rating_count: Optional[int]
-
-    total_bookings: int
-    view_count: int
-    interest_count: int
-
-    is_active: bool = True
-    combo_image_cover_url: Optional[str]
-
+class ComboBase(TourBase):
+    vehicle: int  # 1: Car, 2: Airplane
+    is_disable_itinerary: bool = False
+    
 class ComboResponse(ComboBase):
     id: int
+    vehicle_name: Optional[str] = None
+    departure_city_name: Optional[str] = None
+    destination_city_name: Optional[str] = None
 
     class Config:
         from_attributes = True   # SQLAlchemy ➜ Pydantic
+        
+    def __init__(self, **data):
+        super().__init__(**data)
+        if self.vehicle and not self.vehicle_name:
+            self.vehicle_name = VehicleType.get_name(self.vehicle)

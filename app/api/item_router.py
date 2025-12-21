@@ -21,7 +21,7 @@ def create(
 def get_all(
     db: Session = Depends(get_db)
 ):
-    return get_accommodations_by_city_id(db, 5)
+    return get_accommodations_by_city_id(db, 1)
 
 @router.get("/tours", response_model=list[TourResponse])
 def get_all(

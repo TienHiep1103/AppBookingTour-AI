@@ -21,18 +21,18 @@ def build_city_features(city_id: int, accommodations: list):
     text_vec = tfidf.fit_transform(texts)
 
     numeric = np.array([
-        [a.star_rating or 0, a.rating or 0, a.num_of_rooms or 0, a.avg_price or 0]
+        [np.log1p(float(a.num_of_rooms or 0)), np.log1p(float(a.avg_price or 0))]
         for a in accommodations
     ])
 
     scaler = MinMaxScaler()
     numeric_vec = scaler.fit_transform(numeric)
 
-    final_vec = hstack([text_vec * 0.5, numeric_vec * 0.5]).tocsr()
-
+    final_vec = hstack([text_vec * 0.8, numeric_vec * 0.2]).tocsr()
+    
     _feature_cache[city_id] = {
         "vectors": final_vec,
-        "ids": [...],
+        "ids": [a.id for a in accommodations],
         "tfidf": tfidf,
         "scaler": scaler
     }
@@ -57,8 +57,8 @@ def build_tour_features(tours: list):
 
     numeric = np.array([
         [
-            t.duration_nights or 0,
-            t.duration_days or 0,
+            np.log1p(float(t.duration_nights or 0)),
+            np.log1p(float(t.duration_days or 0)),
             np.log1p(float(t.base_price_adult or 0)),
             np.log1p(float(t.base_price_child or 0))
         ]
@@ -69,10 +69,10 @@ def build_tour_features(tours: list):
     numeric_vec = scaler.fit_transform(numeric)
 
     final_vec = hstack([
-        text_vec * 0.6,
-        numeric_vec * 0.4
+        text_vec * 0.8,
+        numeric_vec * 0.2
     ]).tocsr()
-
+    
     _feature_cache["tour"] = {
         "vectors": final_vec,
         "ids": [t.id for t in tours],
@@ -82,3 +82,42 @@ def build_tour_features(tours: list):
     
 def get_tour_features():
     return _feature_cache.get("tour")
+
+def build_combo_features(combos: list):
+    texts = [f"{c.name or ''} {c.description or ''} {c.short_description or ''}" for c in combos]
+
+    tfidf = TfidfVectorizer(
+        tokenizer=vietnamese_tokenizer,
+        stop_words=VI_STOPWORDS,
+        max_features=500,
+        ngram_range=(1, 2)
+    )
+
+    text_vec = tfidf.fit_transform(texts)
+
+    numeric = np.array([
+        [
+            np.log1p(float(c.duration_days or 0)),
+            np.log1p(float(c.base_price_adult or 0)),
+            np.log1p(float(c.base_price_child or 0))
+        ]
+        for c in combos
+    ])
+
+    scaler = MinMaxScaler()
+    numeric_vec = scaler.fit_transform(numeric)
+
+    final_vec = hstack([
+        text_vec * 0.8,
+        numeric_vec * 0.2
+    ]).tocsr()
+
+    _feature_cache["combo"] = {
+        "vectors": final_vec,
+        "ids": [c.id for c in combos],
+        "tfidf": tfidf,
+        "scaler": scaler
+    }
+
+def get_combo_features():
+    return _feature_cache.get("combo")

@@ -18,8 +18,8 @@ class Tour(BaseEntity):
     code = Column("Code", String(50), nullable=False, unique=True)
     name = Column("Name", String(255), nullable=False)
 
-    type_id = Column("TypeId", Integer, ForeignKey("TourTypes.Id"), nullable=False)
-    category_id = Column("CategoryId", Integer, ForeignKey("TourCategories.Id"), nullable=False)
+    type_id = Column("TypeId", Integer, ForeignKey("TourTypes.Id"), nullable=True)
+    category_id = Column("CategoryId", Integer, ForeignKey("TourCategories.Id"), nullable=True)
 
     departure_city_id = Column("DepartureCityId", Integer, ForeignKey("Cities.Id"), nullable=False)
     destination_city_id = Column("DestinationCityId", Integer, ForeignKey("Cities.Id"), nullable=False)
@@ -28,7 +28,7 @@ class Tour(BaseEntity):
     duration_nights = Column("DurationNights", Integer, nullable=False)
 
     max_participants = Column("MaxParticipants", Integer, nullable=False)
-    min_participants = Column("MinParticipants", Integer, nullable=False)
+    min_participants = Column("MinParticipants", Integer, nullable=True)
 
     base_price_adult = Column("BasePriceAdult", Numeric(18, 2), nullable=False)
     base_price_child = Column("BasePriceChild", Numeric(18, 2), nullable=False)
@@ -45,6 +45,7 @@ class Tour(BaseEntity):
     interest_count = Column("InterestCount", Integer, nullable=False)
 
     image_main_url = Column("ImageMainUrl", String(500), nullable=True)
+    short_description = Column("ShortDescription", String(500), nullable=True)
 
     is_active = Column("IsActive", Boolean, nullable=False, default=True)
     is_deleted = Column("IsDeleted", Boolean, nullable=False, default=False)

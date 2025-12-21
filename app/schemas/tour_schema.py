@@ -7,8 +7,8 @@ class TourBase(BaseModel):
     code: str
     name: str
 
-    type_id: int
-    category_id: int
+    type_id: Optional[int]
+    category_id: Optional[int]
 
     departure_city_id: int
     destination_city_id: int
@@ -17,7 +17,7 @@ class TourBase(BaseModel):
     duration_nights: int
 
     max_participants: int
-    min_participants: int
+    min_participants: Optional[int]
 
     base_price_adult: Decimal
     base_price_child: Decimal
@@ -34,6 +34,7 @@ class TourBase(BaseModel):
     interest_count: int
 
     image_main_url: Optional[str]
+    short_description: Optional[str]
     is_active: bool = True
 
 class TourResponse(TourBase):
