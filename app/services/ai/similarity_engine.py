@@ -17,7 +17,7 @@ def top_k_similar(vectors, item_index: int, top_k: int = 5):
     sorted_idx = np.argsort(scores)[::-1]
 
     results = [
-        i for i in sorted_idx if scores[i] > 0
+        (i, scores[i]) for i in sorted_idx if scores[i] > 0
     ]
 
     return results[:top_k]
