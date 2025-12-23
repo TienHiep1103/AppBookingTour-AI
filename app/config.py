@@ -20,13 +20,13 @@ def _build_sqlalchemy_url_from_odbc(odbc_conn: str) -> str:
 _database_url: Optional[str] = os.getenv("DATABASE_URL")
 _odbc_conn: Optional[str] = os.getenv("ODBC_CONNECTION_STRING")
 
-# if _database_url:
-#     CONNECTION_STRING = _database_url
-# elif _odbc_conn:
-#     CONNECTION_STRING = _build_sqlalchemy_url_from_odbc(_odbc_conn)
-# else:
-#     print("Warning: No database connection string provided. Set DATABASE_URL or ODBC_CONNECTION_STRING in environment variables.")
-#     CONNECTION_STRING = ""
+if _database_url:
+    CONNECTION_STRING = _database_url
+elif _odbc_conn:
+    CONNECTION_STRING = _build_sqlalchemy_url_from_odbc(_odbc_conn)
+else:
+    print("Warning: No database connection string provided. Set DATABASE_URL or ODBC_CONNECTION_STRING in environment variables.")
+    CONNECTION_STRING = ""
 
 print("DATABASE_URL:", _database_url)
 print("ODBC_CONNECTION_STRING:", _odbc_conn)
