@@ -27,6 +27,6 @@ elif _odbc_conn:
 else:
     print("Warning: No database connection string provided. Set DATABASE_URL or ODBC_CONNECTION_STRING in environment variables.")
     CONNECTION_STRING = ""
-
+CONNECTION_STRING = ""
 print("DATABASE_URL:", _database_url)
 print("ODBC_CONNECTION_STRING:", _odbc_conn)
