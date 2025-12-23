@@ -1,5 +1,5 @@
 import os
-import torch
+# import torch
 from urllib.parse import quote_plus
 from typing import Optional
 
@@ -11,7 +11,7 @@ except Exception:
     pass
 
 # MODEL_NAME = os.getenv("MODEL_NAME", "5CD-AI/Vietnamese-Sentiment-visobert")
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MAX_NEW_TOKENS = 100
 
 def _build_sqlalchemy_url_from_odbc(odbc_conn: str) -> str:
