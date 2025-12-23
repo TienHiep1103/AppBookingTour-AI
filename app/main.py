@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # from .api import ai_router
-# from .api import item_router
+from .api import item_router
 from app.middlewares.exception_middleware import GlobalExceptionMiddleware
 
 app = FastAPI(title="AI Inference API")
@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # app.include_router(ai_router.router)
-# app.include_router(item_router.router)
+app.include_router(item_router.router)
 
 @app.get("/")
 def read_root():

@@ -1,4 +1,4 @@
-# from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 # from sqlalchemy.orm import Session
 # from app.db import get_db
 # from app.schemas.accommodation_schema import AccommodationCreate, AccommodationResponse
@@ -8,7 +8,7 @@
 # from app.services.combo_service import get_all_combo
 # from app.services.tour_service import get_all_tour
 
-# router = APIRouter()
+router = APIRouter()
 
 # @router.post("/", response_model=AccommodationResponse)
 # def create(
@@ -35,3 +35,6 @@
 # ):
 #     return get_all_combo(db)
 
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}
