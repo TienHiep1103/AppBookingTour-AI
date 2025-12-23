@@ -25,11 +25,5 @@ if _database_url:
 elif _odbc_conn:
 	CONNECTION_STRING = _build_sqlalchemy_url_from_odbc(_odbc_conn)
 else:
-	default_odbc = (
-		"DRIVER={ODBC Driver 17 for SQL Server};"
-		"SERVER=localhost;"
-		"DATABASE=AppBookingTour_Dev;"
-		"TrustServerCertificate=yes;"
-		"Trusted_Connection=yes"
-	)
-	CONNECTION_STRING = _build_sqlalchemy_url_from_odbc(default_odbc)
+	print("Warning: No database connection string provided. Set DATABASE_URL or ODBC_CONNECTION_STRING in environment variables.")
+    CONNECTION_STRING = ""
