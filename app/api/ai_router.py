@@ -3,7 +3,6 @@ from fastapi import APIRouter, Query
 from app.db import get_db
 from app.enums import ItemType
 from app.schemas.combo_schema import ComboResponse
-from ..schemas.ai_schema import AIRequest, AIResponse, RecommendationDetailRequest
 from ..services.ai_service import predictComment
 from ..schemas.tour_schema import TourResponse
 from ..schemas.accommodation_schema import AccommodationResponse
@@ -16,10 +15,10 @@ from typing import Optional
 
 router = APIRouter(prefix="/api", tags=["api"])
 
-@router.post("/predictComment", response_model=AIResponse)
-def predictComment_endpoint(request: AIRequest):
-    label = predictComment(request.comment)
-    return AIResponse(label=label)
+# @router.post("/predictComment", response_model=AIResponse)
+# def predictComment_endpoint(request: AIRequest):
+#     label = predictComment(request.comment)
+#     return AIResponse(label=label)
 
 @router.get("/accommodations/recommendations/{item_id}", response_model=list[AccommodationResponse])
 def get_accommodation_recommendations(
