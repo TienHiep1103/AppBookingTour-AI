@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# app.include_router(ai_router.router)
+app.include_router(ai_router.router)
 app.include_router(item_router.router)
 
 @app.get("/")
