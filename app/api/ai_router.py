@@ -3,7 +3,7 @@ from fastapi import APIRouter, Query
 from app.db import get_db
 from app.enums import ItemType
 from app.schemas.combo_schema import ComboResponse
-from ..services.ai_service import predictComment
+# from ..services.ai_service import predictComment
 from ..schemas.tour_schema import TourResponse
 from ..schemas.accommodation_schema import AccommodationResponse
 from ..schemas.tour_schema import TourResponse
