@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# from .api import ai_router
+from .api import ai_router
 from .api import item_router
 from app.middlewares.exception_middleware import GlobalExceptionMiddleware
 
