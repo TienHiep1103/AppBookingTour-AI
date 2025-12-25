@@ -1,6 +1,8 @@
 from app.config import CONNECTION_STRING
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
+import urllib.parse
 
 raw_conn_str = os.getenv("SQL_CONNECTION_STRING")
 
