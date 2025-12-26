@@ -18,19 +18,19 @@ def create(
     return create_accommodation(db, data)
 
 @router.get("/accommodations", response_model=list[AccommodationResponse])
-def get_all(
+def get_all_accommodations(
     db: Session = Depends(get_db)
 ):
     return get_accommodations_by_city_id(db, 1)
 
 @router.get("/tours", response_model=list[TourResponse])
-def get_all(
+def get_all_tours(
     db: Session = Depends(get_db)
 ):
     return get_all_tour(db)
 
 @router.get("/combos", response_model=list[ComboResponse])
-def get_all(
+def get_all_combos(
     db: Session = Depends(get_db)
 ):
     return get_all_combo(db)

@@ -1,5 +1,4 @@
 import os
-# import torch
 from urllib.parse import quote_plus
 from typing import Optional
 
@@ -12,7 +11,7 @@ except Exception:
 
 # MODEL_NAME = os.getenv("MODEL_NAME", "5CD-AI/Vietnamese-Sentiment-visobert")
 # DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MAX_NEW_TOKENS = 100
+# MAX_NEW_TOKENS = 100
 
 def _build_sqlalchemy_url_from_odbc(odbc_conn: str) -> str:
     return f"mssql+pyodbc:///?odbc_connect={quote_plus(odbc_conn)}"
@@ -27,6 +26,5 @@ elif _odbc_conn:
 else:
     print("Warning: No database connection string provided. Set DATABASE_URL or ODBC_CONNECTION_STRING in environment variables.")
     CONNECTION_STRING = ""
-print("DATABASE_URL:", _database_url)
-print("ODBC_CONNECTION_STRING:", _odbc_conn)
-print("CONNECTION_STRING:", CONNECTION_STRING)
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
