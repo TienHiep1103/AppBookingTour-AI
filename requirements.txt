@@ -9,3 +9,4 @@ gunicorn
 python-dotenv>=1.0.0
 scikit-learn
 underthesea==6.3.0
+httpx>=0.27.0
