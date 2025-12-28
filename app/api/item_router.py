@@ -35,3 +35,6 @@ def get_all_combos(
 ):
     return get_all_combo(db)
 
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}

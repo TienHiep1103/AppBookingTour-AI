@@ -1,4 +1,4 @@
-from app.models.city import City
+from ...models.city import City
 from app.services.ai.feature_store import get_city_features, build_city_features, build_tour_features, get_tour_features, build_combo_features, get_combo_features
 from app.services.ai.similarity_engine import top_k_similar
 from app.services.accommodation_service import get_accommodations_by_city_id, _enrich_accommodations_with_room_info

@@ -4,8 +4,6 @@ from app.db import get_db
 from app.enums import ItemType
 from app.schemas.combo_schema import ComboResponse
 from app.schemas.ai_schema import GeminiSummarizeRequest, GeminiSummarizeResponse
-# from ..schemas.ai_schema import AIRequest, AIResponse, RecommendationDetailRequest
-# from ..services.ai_service import predictComment
 from ..schemas.tour_schema import TourResponse
 from ..schemas.accommodation_schema import AccommodationResponse
 from ..schemas.tour_schema import TourResponse
@@ -97,22 +95,6 @@ def recommend_collaborative(
 
 @router.post("/ai/summarize", response_model=GeminiSummarizeResponse)
 def summarize_comments(request: GeminiSummarizeRequest):
-    """
-    Summarize a list of comments using OpenRouter AI.
-    
-    - **comments**: List of comment strings to summarize
-    - **language**: Language for summary (vi for Vietnamese, en for English, etc.)
-    - **model**: OpenRouter model to use (default: arcee-ai/trinity-mini:free)
-      Popular models:
-      - arcee-ai/trinity-mini:free (Free, fast)
-      - qwen/qwen3-4b:free (Free, fast)
-      - google/gemini-2.0-flash-exp:free (Free, high quality)
-      - meta-llama/llama-3.3-70b-instruct:free (Free)
-      - openai/gpt-3.5-turbo (Paid, reliable)
-    
-    Returns a concise summary of all comments focusing on key points,
-    positive aspects, and negative aspects (if any).
-    """
     try:
         openrouter_service = OpenRouterService()
         summary = openrouter_service.summarize_comments(

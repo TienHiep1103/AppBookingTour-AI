@@ -45,7 +45,6 @@ class Tour(BaseEntity):
     interest_count = Column("InterestCount", Integer, nullable=False)
 
     image_main_url = Column("ImageMainUrl", String(500), nullable=True)
-    short_description = Column("ShortDescription", String(500), nullable=True)
 
     is_active = Column("IsActive", Boolean, nullable=False, default=True)
     is_combo = Column("IsCombo", Boolean, nullable=False, default=False)
