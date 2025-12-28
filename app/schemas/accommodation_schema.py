@@ -3,24 +3,24 @@ from typing import Optional
 from decimal import Decimal
 
 class AccommodationBase(BaseModel):
-    city_id: int
-    type: Optional[int]
-    code: Optional[str]
+    city_id: Optional[int] = None
+    type: Optional[int] = None
+    code: Optional[str] = None
 
-    name: str
-    address: Optional[str]
+    name: Optional[str] = None
+    address: Optional[str] = None
 
-    star_rating: int
-    rating: Optional[Decimal]
-    rating_count: Optional[int]
+    star_rating: Optional[int] = None
+    rating: Optional[Decimal] = None
+    rating_count: Optional[int] = None
 
-    description: Optional[str]
-    regulation: Optional[str]
-    amenities: Optional[str]
+    description: Optional[str] = None
+    regulation: Optional[str] = None
+    amenities: Optional[str] = None
 
-    is_active: bool = True
-    cover_img_url: Optional[str]
-    coordinates: Optional[str]
+    is_active: Optional[bool] = True
+    cover_img_url: Optional[str] = None
+    coordinates: Optional[str] = None
 
 
 class AccommodationCreate(AccommodationBase):
@@ -28,7 +28,7 @@ class AccommodationCreate(AccommodationBase):
 
 
 class AccommodationResponse(AccommodationBase):
-    id: int
+    id: Optional[int] = None
     num_of_rooms: Optional[int] = None
     avg_price: Optional[Decimal] = None
     city_name: Optional[str] = None
