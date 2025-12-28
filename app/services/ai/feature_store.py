@@ -84,7 +84,7 @@ def get_tour_features():
     return _feature_cache.get("tour")
 
 def build_combo_features(combos: list):
-    texts = [f"{c.name or ''} {c.description or ''} {c.short_description or ''}" for c in combos]
+    texts = [f"{c.name or ''} {c.short_description or ''}" for c in combos]
 
     tfidf = TfidfVectorizer(
         tokenizer=vietnamese_tokenizer,

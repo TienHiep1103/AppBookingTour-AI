@@ -4,6 +4,7 @@ from .cf_model import CFModel
 from app.models.tour import Tour
 from app.models.accommodation import Accommodation
 from app.models.combo import Combo
+from app.models.city import City
 from app.enums import ItemType
 from typing import Optional
 
@@ -24,6 +25,10 @@ class CollaborativeFilteringService:
             except Exception as e:
                 print(f"CF Model error: {e}")
                 recommended_ids = []
+        
+        # Lấy tất cả cities từ DB và tạo map id -> name
+        cities = db.query(City).all()
+        city_map = {city.id: city.name for city in cities}
         
         # Lấy items từ DB theo item_type
         if item_type == ItemType.TOUR:
@@ -63,5 +68,11 @@ class CollaborativeFilteringService:
                 ).limit(remaining).all()
             
             result.extend(fallback_items)
+        
+        # Gán city names cho Tour và Combo
+        if item_type in [ItemType.TOUR, ItemType.COMBO]:
+            for item in result:
+                item.departure_city_name = city_map.get(item.departure_city_id, None)
+                item.destination_city_name = city_map.get(item.destination_city_id, None)
         
         return result[:top_n]
