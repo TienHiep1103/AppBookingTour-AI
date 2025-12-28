@@ -4,41 +4,41 @@ from decimal import Decimal
 
 
 class TourBase(BaseModel):
-    code: str
-    name: str
+    code: Optional[str] = None
+    name: Optional[str] = None
 
-    type_id: Optional[int]
-    category_id: Optional[int]
+    type_id: Optional[int] = None
+    category_id: Optional[int] = None
 
-    departure_city_id: int
-    destination_city_id: int
+    departure_city_id: Optional[int] = None
+    destination_city_id: Optional[int] = None
 
-    duration_days: int
-    duration_nights: int
+    duration_days: Optional[int] = None
+    duration_nights: Optional[int] = None
 
-    max_participants: int
-    min_participants: Optional[int]
+    max_participants: Optional[int] = None
+    min_participants: Optional[int] = None
 
-    base_price_adult: Decimal
-    base_price_child: Decimal
+    base_price_adult: Optional[Decimal] = None
+    base_price_child: Optional[Decimal] = None
 
-    description: Optional[str]
-    additional_info: Optional[str]
-    important_info: Optional[str]
+    description: Optional[str] = None
+    additional_info: Optional[str] = None
+    important_info: Optional[str] = None
 
-    rating: Decimal
-    rating_count: Optional[int]
+    rating: Optional[Decimal] = None
+    rating_count: Optional[int] = None
 
-    total_bookings: int
-    view_count: int
-    interest_count: int
+    total_bookings: Optional[int] = None
+    view_count: Optional[int] = None
+    interest_count: Optional[int] = None
 
-    image_main_url: Optional[str]
-    short_description: Optional[str]
-    is_active: bool = True
+    image_main_url: Optional[str] = None
+    short_description: Optional[str] = None
+    is_active: Optional[bool] = True
 
 class TourResponse(TourBase):
-    id: int
+    id: Optional[int] = None
     departure_city_name: Optional[str] = None
     destination_city_name: Optional[str] = None
 
