@@ -34,6 +34,7 @@ class Tour(BaseEntity):
     base_price_child = Column("BasePriceChild", Numeric(18, 2), nullable=False)
 
     description = Column("Description", Text, nullable=True)
+    short_description = Column("ShortDescription", Text, nullable=True)
     additional_info = Column("AdditionalInfo", Text, nullable=True)
     important_info = Column("ImportantInfo", Text, nullable=True)
 
