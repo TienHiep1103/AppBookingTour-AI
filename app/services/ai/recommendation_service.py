@@ -189,7 +189,8 @@ def recommend_tours(db, tour_id: int, top_k: int = 5, exclude_ids: list[int] = N
     # Get all active tours for re-ranking
     all_tours = db.query(Tour).filter(
         Tour.is_active == True,
-        Tour.id.notin_(exclude_set)
+        Tour.id.notin_(exclude_set),
+        Tour.is_combo == False
     ).all()
     
     if not all_tours:
