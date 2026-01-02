@@ -30,9 +30,18 @@ class OpenRouterService:
         
         Returns:
             Summarized text
+            
+        Note:
+            If the primary model fails, it will automatically fallback in order:
+            1. meta-llama/llama-3.1-405b-instruct:free
+            2. alibaba/tongyi-deepresearch-30b-a3b:free
         """
         if not comments:
             return "No comments to summarize."
+        
+        # Model dự phòng theo thứ tự ưu tiên
+        fallback_model_1 = "meta-llama/llama-3.1-405b-instruct:free"
+        fallback_model_2 = "alibaba/tongyi-deepresearch-30b-a3b:free"
         
         # Xây dựng prompt theo ngôn ngữ
         language_prompts = {
@@ -56,6 +65,37 @@ Write the summary in English, approximately 3-5 sentences."""
         
         # Lấy prompt theo ngôn ngữ, mặc định tiếng Việt
         prompt = language_prompts.get(language, language_prompts["vi"])
+        
+        # Thử gọi với model chính
+        try:
+            return self._call_model(model, prompt)
+        except Exception as primary_error:
+            # Nếu model chính lỗi, thử với fallback model 1
+            if model != fallback_model_1:
+                try:
+                    print(f"Primary model '{model}' failed: {str(primary_error)}. Switching to fallback model 1 '{fallback_model_1}'")
+                    return self._call_model(fallback_model_1, prompt)
+                except Exception as fallback1_error:
+                    # Nếu fallback 1 lỗi, thử với fallback model 2
+                    try:
+                        print(f"Fallback model 1 '{fallback_model_1}' failed: {str(fallback1_error)}. Switching to fallback model 2 '{fallback_model_2}'")
+                        return self._call_model(fallback_model_2, prompt)
+                    except Exception as fallback2_error:
+                        raise Exception(f"All models failed. Primary: {str(primary_error)}, Fallback1: {str(fallback1_error)}, Fallback2: {str(fallback2_error)}")
+            else:
+                raise Exception(f"Failed to generate summary: {str(primary_error)}")
+    
+    def _call_model(self, model: str, prompt: str) -> str:
+        """
+        Call OpenRouter API with specific model
+        
+        Args:
+            model: Model identifier
+            prompt: Prompt to send
+            
+        Returns:
+            Model response text
+        """
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -92,16 +132,14 @@ Write the summary in English, approximately 3-5 sentences."""
                 "max_tokens": 1000
             }
         
-        try:
-            with httpx.Client(timeout=30.0) as client:
-                response = client.post(self.BASE_URL, json=payload, headers=headers)
-                response.raise_for_status()
-                data = response.json()
-                return data["choices"][0]["message"]["content"]
-        except httpx.HTTPStatusError as e:
-            raise Exception(f"OpenRouter API error: {e.response.status_code} - {e.response.text}")
-        except Exception as e:
-            raise Exception(f"Failed to generate summary: {str(e)}")
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(self.BASE_URL, json=payload, headers=headers)
+            response.raise_for_status()
+            
+            data = response.json()
+            if data.get("error"):
+                raise Exception(data["error"].get("message"))
+            return data["choices"][0]["message"]["content"]
     
     def _format_comments(self, comments: list[str]) -> str:
         """Format comments into numbered list"""
